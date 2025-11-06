@@ -92,19 +92,17 @@ pipeline {
                         set -e
                         cd /tmp; rm -f *.tar.gz
 
-                        echo "🔍 Fetching latest tarball from Nexus..."
-                        DOWNLOAD_URL=$(curl -s -u ${NEXUS_USR}:${NEXUS_PSW} \
-                            "${NEXUS_URL}/service/rest/v1/search?repository=${NEXUS_REPO}&group=com.web.pomodoro&name=${NEXUS_ARTIFACT}" \
-                            | grep -oP '"downloadUrl"\\s*:\\s*"\\K[^"]+' | grep -E '\\.tar\\.gz' | tail -1)
+                        VERSION="0.0.${BUILD_NUMBER}"
+                        TARBALL="${NEXUS_ARTIFACT}-${VERSION}.tar.gz"
+                        DOWNLOAD_URL="${NEXUS_URL}/repository/${NEXUS_REPO}/${NEXUS_GROUP}/${NEXUS_ARTIFACT}/${VERSION}/${TARBALL}"
 
-                        if [[ -z "$DOWNLOAD_URL" ]]; then
-                            echo "❌ No tarball found in Nexus!"
+                        echo "⬇️ Downloading tarball from: $DOWNLOAD_URL"
+                        curl -f -u ${NEXUS_USR}:${NEXUS_PSW} -O "$DOWNLOAD_URL"
+
+                        if [[ ! -f "$TARBALL" ]]; then
+                            echo "❌ Download failed!"
                             exit 1
                         fi
-
-                        echo "⬇️ Downloading tarball: $DOWNLOAD_URL"
-                        curl -u ${NEXUS_USR}:${NEXUS_PSW} -O "$DOWNLOAD_URL"
-                        TARBALL=$(basename "$DOWNLOAD_URL")
 
                         echo "🚀 Deploying to Nginx..."
                         sudo mkdir -p ${NGINX_WEB_ROOT}
