@@ -36,14 +36,15 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo '🔍 Running SonarQube static analysis...'
+                sh 'npm install -g sonarqube-scanner || npm install --save-dev sonarqube-scanner'
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
                     sh '''
-                        sonar-scanner \
+                        npx sonar-scanner \
                           -Dsonar.projectKey=pomodoro-app-js \
                           -Dsonar.projectName="Pomodoro App JS" \
                           -Dsonar.projectVersion=0.0.${BUILD_NUMBER} \
                           -Dsonar.sources=src \
-                          -Dsonar.language=js \
+                          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
                           -Dsonar.sourceEncoding=UTF-8
                     '''
                 }
