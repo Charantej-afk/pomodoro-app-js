@@ -31,6 +31,27 @@ docker run -d -p 8080:80 pomodoro-webapp
 - Customizable durations and session counter
 - Browser notifications and responsive UI
 
-## Jenkins CI/CD
+## Jenkins CI/CD Pipeline
 
-Automated deployment with stages: checkout → install → build → deploy → start. Push to main branch triggers deployment.
+Fully automated CI/CD pipeline with the following stages:
+
+1. **Checkout Code** - Clones repository from GitHub
+2. **Install Dependencies** - Runs `npm install`
+3. **SonarQube Analysis** - Static code analysis and quality checks
+4. **Run Tests** - Executes `npm test`
+5. **Build Artifact** - Builds production bundle with `npm run build`
+6. **Package Artifact** - Creates versioned tarball (`.tar.gz`)
+7. **Upload to Nexus** - Stores artifact in Nexus repository
+8. **Deploy to Nginx** - Downloads from Nexus and deploys to Nginx server
+
+### Requirements
+
+- Jenkins with `sonar` and `tomcat` agent labels
+- SonarQube server configured in Jenkins
+- Nexus Repository Manager
+- Nginx web server
+- Credentials configured: `nexus` (username/password)
+
+### Deployment
+
+Push to `main` branch triggers automatic deployment. Application is accessible via Nginx at configured server.
