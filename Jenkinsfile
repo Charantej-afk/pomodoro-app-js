@@ -3,11 +3,11 @@ pipeline {
 
     environment {
         SONARQUBE_SERVER = 'sonar'
-        NEXUS_URL = 'http://3.19.221.46:8081'
+        NEXUS_URL = 'http://98.84.112.99:8081'
         NEXUS_REPO = 'raw-releases'
         NEXUS_GROUP = 'com/web/pomodoro'
         NEXUS_ARTIFACT = 'pomodoro-app'
-        NGINX_SERVER = '18.116.203.32'
+        NGINX_SERVER = '54.175.61.237'
         NGINX_WEB_ROOT = '/var/www/html'
     }
 
@@ -18,7 +18,7 @@ pipeline {
                 echo '📦 Cloning source from GitHub...'
                 checkout([$class: 'GitSCM',
                     branches: [[name: '*/main']],
-                    userRemoteConfigs: [[url: 'https://github.com/ashuvee/pomodoro-app-js.git']]
+                    userRemoteConfigs: [[url: 'https://github.com/Charantej-afk/pomodoro-app-js.git']]
                 ])
             }
         }
