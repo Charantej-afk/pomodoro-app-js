@@ -43,7 +43,14 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           npm install --save-dev sonarqube-scanner
-          npx sonar-scanner -Dsonar.projectKey=pomodoro-app-js -Dsonar.projectName="Pomodoro App JS" -Dsonar.projectVersion=${{ env.BUILD_VER }} -Dsonar.sources=src -Dsonar.host.url=${{ env.SONAR_URL }} -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.sourceEncoding=UTF-8
+          bash -c "npx sonar-scanner \
+            -Dsonar.projectKey=pomodoro-app-js \
+            -Dsonar.projectName='Pomodoro App JS' \
+            -Dsonar.projectVersion=${{ env.BUILD_VER }} \
+            -Dsonar.sources=src \
+            -Dsonar.host.url=${{ env.SONAR_URL }} \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.sourceEncoding=UTF-8"
 
       # --- Run Tests ---
       - name: 🧪 Run Tests
