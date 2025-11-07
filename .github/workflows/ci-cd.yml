@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      SONAR_SERVER: 'SonarQube'
       SONAR_URL: 'http://3.93.191.37:9000'
       NEXUS_URL: 'http://54.90.212.15:8081'
       NEXUS_REPO: 'raw-releases'
@@ -39,21 +38,23 @@ jobs:
 
       # --- SonarQube Analysis (Self-hosted) ---
       - name: 🔍 SonarQube Analysis
-        shell: bash
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: bash
         run: |
           npm install --save-dev sonarqube-scanner
-          bash -c "npx sonar-scanner \
-            -Dsonar.projectKey=pomodoro-app-js \
-            -Dsonar.projectName='Pomodoro App JS' \
-            -Dsonar.projectVersion=${{ env.BUILD_VER }} \
-            -Dsonar.sources=src \
-            -Dsonar.host.url=${{ env.SONAR_URL }} \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.sourceEncoding=UTF-8"
-          echo '✅ SonarQube Analysis finished successfully!'
-
+          echo "Running SonarQube scanner..."
+          npx sonar-scanner $(cat <<EOF
+            -Dsonar.projectKey=pomodoro-app-js
+            -Dsonar.projectName=PomodoroAppJS
+            -Dsonar.projectVersion=${{ env.BUILD_VER }}
+            -Dsonar.sources=src
+            -Dsonar.host.url=${{ env.SONAR_URL }}
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.sourceEncoding=UTF-8
+          EOF
+          )
+          echo "✅ SonarQube Analysis completed successfully!"
 
       # --- Run Tests ---
       - name: 🧪 Run Tests
