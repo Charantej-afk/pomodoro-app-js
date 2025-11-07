@@ -39,6 +39,7 @@ jobs:
 
       # --- SonarQube Analysis (Self-hosted) ---
       - name: 🔍 SonarQube Analysis
+        shell: bash
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
@@ -51,6 +52,8 @@ jobs:
             -Dsonar.host.url=${{ env.SONAR_URL }} \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.sourceEncoding=UTF-8"
+          echo '✅ SonarQube Analysis finished successfully!'
+
 
       # --- Run Tests ---
       - name: 🧪 Run Tests
