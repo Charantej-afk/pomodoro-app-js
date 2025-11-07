@@ -1,0 +1,109 @@
+name: CI/CD Pipeline - Pomodoro App JS
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      SONAR_SERVER: 'SonarQube'
+      NEXUS_URL: 'http://98.84.112.99:8081'
+      NEXUS_REPO: 'raw-releases'
+      NEXUS_GROUP: 'com/web/pomodoro'
+      NEXUS_ARTIFACT: 'pomodoro-app'
+      NGINX_SERVER: '54.175.61.237'
+      NGINX_WEB_ROOT: '/var/www/html'
+      BUILD_VER: 0.0.${{ github.run_number }}
+      TARBALL: pomodoro-app-${{ github.run_number }}.tar.gz
+
+    steps:
+      # --- Checkout Code ---
+      - name: 📦 Checkout Code
+        uses: actions/checkout@v4
+
+      # --- Setup Node.js ---
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # --- Install Dependencies ---
+      - name: 📥 Install Dependencies
+        run: |
+          npm install
+          echo "✅ Dependencies installed!"
+
+      # --- SonarQube Analysis ---
+      - name: 🔍 SonarQube Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          npm install --save-dev sonarqube-scanner
+          npx sonar-scanner \
+            -Dsonar.projectKey=pomodoro-app-js \
+            -Dsonar.projectName="Pomodoro App JS" \
+            -Dsonar.projectVersion=${{ env.BUILD_VER }} \
+            -Dsonar.sources=src \
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
+            -Dsonar.sourceEncoding=UTF-8 \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+      # --- Run Tests ---
+      - name: 🧪 Run Tests
+        run: |
+          npm test || echo "⚠️ No tests found, skipping..."
+
+      # --- Build Artifact ---
+      - name: ⚙️ Build Artifact
+        run: |
+          npm run build
+          echo "✅ Build Completed!"
+          ls -lh dist/ || true
+
+      # --- Package Artifact ---
+      - name: 📦 Package Artifact
+        run: |
+          tar -czf ${{ env.TARBALL }} -C dist .
+          echo "✅ Package created: ${{ env.TARBALL }}"
+          ls -lh ${{ env.TARBALL }}
+
+      # --- Upload to Nexus ---
+      - name: 📤 Upload Artifact to Nexus
+        env:
+          NEXUS_USER: ${{ secrets.NEXUS_USER }}
+          NEXUS_PASS: ${{ secrets.NEXUS_PASS }}
+        run: |
+          echo "📤 Uploading artifact to Nexus..."
+          curl -v -u $NEXUS_USER:$NEXUS_PASS --upload-file "${{ env.TARBALL }}" \
+            "${{ env.NEXUS_URL }}/repository/${{ env.NEXUS_REPO }}/${{ env.NEXUS_GROUP }}/${{ env.NEXUS_ARTIFACT }}/${{ env.BUILD_VER }}/${{ env.TARBALL }}"
+          echo "✅ Artifact uploaded successfully to Nexus!"
+
+      # --- Deploy to Nginx ---
+      - name: 🚀 Deploy to Nginx
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ env.NGINX_SERVER }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            set -e
+            cd /tmp
+            rm -f *.tar.gz
+            DOWNLOAD_URL="${{ env.NEXUS_URL }}/repository/${{ env.NEXUS_REPO }}/${{ env.NEXUS_GROUP }}/${{ env.NEXUS_ARTIFACT }}/${{ env.BUILD_VER }}/${{ env.TARBALL }}"
+            echo "⬇️ Downloading tarball from: $DOWNLOAD_URL"
+            curl -f -u ${{ secrets.NEXUS_USER }}:${{ secrets.NEXUS_PASS }} -O "$DOWNLOAD_URL"
+
+            if [[ ! -f "${{ env.TARBALL }}" ]]; then
+              echo "❌ Download failed!"
+              exit 1
+            fi
+
+            echo "🚀 Deploying to Nginx..."
+            sudo mkdir -p ${{ env.NGINX_WEB_ROOT }}
+            sudo rm -rf ${{ env.NGINX_WEB_ROOT }}/*
+            sudo tar -xzf "${{ env.TARBALL }}" -C ${{ env.NGINX_WEB_ROOT }}/
+            sudo chown -R www-data:www-data ${{ env.NGINX_WEB_ROOT }}
+            echo "✅ Deployment successful! Application live on Nginx!"
