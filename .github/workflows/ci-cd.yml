@@ -10,6 +10,7 @@ jobs:
 
     env:
       SONAR_SERVER: 'SonarQube'
+      SONAR_URL: 'http://3.93.191.37:9000'
       NEXUS_URL: 'http://54.90.212.15:8081'
       NEXUS_REPO: 'raw-releases'
       NEXUS_GROUP: 'com/web/pomodoro'
@@ -36,7 +37,7 @@ jobs:
           npm install
           echo "✅ Dependencies installed!"
 
-      # --- SonarQube Analysis ---
+      # --- SonarQube Analysis (Self-hosted) ---
       - name: 🔍 SonarQube Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -47,9 +48,9 @@ jobs:
             -Dsonar.projectName="Pomodoro App JS" \
             -Dsonar.projectVersion=${{ env.BUILD_VER }} \
             -Dsonar.sources=src \
-            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-            -Dsonar.sourceEncoding=UTF-8 \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.host.url=${{ env.SONAR_URL }} \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.sourceEncoding=UTF-8
 
       # --- Run Tests ---
       - name: 🧪 Run Tests
