@@ -37,7 +37,7 @@ jobs:
           npm install
           echo "✅ Dependencies installed!"
 
-            # --- SonarQube Analysis (Self-hosted) ---
+      # --- SonarQube Analysis (Self-hosted) ---
       - name: 🔍 SonarQube Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
