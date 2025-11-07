@@ -10,11 +10,11 @@ jobs:
 
     env:
       SONAR_SERVER: 'SonarQube'
-      NEXUS_URL: 'http://98.84.112.99:8081'
+      NEXUS_URL: 'http://54.90.212.15:8081'
       NEXUS_REPO: 'raw-releases'
       NEXUS_GROUP: 'com/web/pomodoro'
       NEXUS_ARTIFACT: 'pomodoro-app'
-      NGINX_SERVER: '54.175.61.237'
+      NGINX_SERVER: '34.224.38.174'
       NGINX_WEB_ROOT: '/var/www/html'
       BUILD_VER: 0.0.${{ github.run_number }}
       TARBALL: pomodoro-app-${{ github.run_number }}.tar.gz
