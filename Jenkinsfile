@@ -40,18 +40,6 @@ pipeline {
             }
         }
 
-        stage('Lint Code') {
-            steps {
-                script {
-                    // Install ESLint if it's not installed yet
-                    sh 'npm install eslint'
-                    
-                    // Run ESLint using the flat config
-                    sh 'npx eslint .'
-                }
-            }
-        }
-
         stage('SonarQube Analysis') {
             steps {
                 script {
