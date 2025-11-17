@@ -62,7 +62,8 @@ pipeline {
                         echo 'Downloading and extracting SonarQube Scanner CLI...'
                         SONAR_URL="https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${env.SONAR_SCANNER_VERSION}.zip"
                         curl -sSLo sonar-scanner.zip \$SONAR_URL
-                        unzip -q sonar-scanner.zip
+                        # FIX: Use '-o' (overwrite) flag to prevent the interactive prompt from unzip
+                        unzip -o -q sonar-scanner.zip
                     """
                     
                     // 2. Execute SonarQube Analysis (Groovy Step)
