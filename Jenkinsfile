@@ -87,6 +87,10 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
+                // NEW: Install the Docker CLI inside the container before running the build command
+                script {
+                    sh 'apt-get update -y -qq && apt-get install -y docker.io -qq'
+                }
                 // This step now runs successfully using the host Docker daemon via the mounted socket
                 sh 'docker build -t ${DOCKER_IMAGE} .'
             }
