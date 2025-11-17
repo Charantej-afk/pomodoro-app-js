@@ -7,7 +7,7 @@ pipeline {
     }
 
     tools {
-        sonarQubeScanner 'SonarScanner' // Name configured in Jenkins Global Tool Configuration
+        sonarRunner 'SonarScanner' // Correct tool type for SonarQube Scanner
     }
 
     environment {
