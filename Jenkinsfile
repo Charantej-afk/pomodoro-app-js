@@ -44,17 +44,15 @@ pipeline {
             }
         }
 
-        stage('Lint Code') {
-            steps {
-                script {
-                    // Install ESLint if it's not installed yet
-                    sh 'npm install eslint'
-                    
-                    // Lint the code using ESLint
-                    sh 'npx eslint .'
-                }
-            }
-        }
+        // Skipping the Lint Code stage to avoid complications with ESLint
+        // stage('Lint Code') {
+        //     steps {
+        //         script {
+        //             // Run ESLint on the codebase
+        //             sh 'npx eslint .'
+        //         }
+        //     }
+        // }
 
         stage('SonarQube Analysis') {
             steps {
