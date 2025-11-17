@@ -1,10 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'node:18' // Node.js environment
-            // FIX: The 'network' option is not directly supported by the Jenkins plugin.
-            // It must be passed as an argument to 'docker run' using the '--network' flag inside 'args'.
-            // Combining '-u root:root' and '--network pomodoro-app-js_cicd-network'
+            image 'node:18'
             args '-u root:root --network pomodoro-app-js_cicd-network' 
         }
     }
@@ -68,9 +65,13 @@ pipeline {
                     
                     // 2. Execute SonarQube Analysis (Groovy Step)
                     echo "Starting SonarQube analysis against server ID: ${env.SONAR_SERVER_ID}"
-                    withSonarQubeEnv(env.SONAR_SERVER_ID) {
-                        // Execute the scanner using its relative path in the workspace
-                        sh "${env.SONAR_SCANNER_DIR}/bin/sonar-scanner -Dsonar.projectKey=${env.SONAR_PROJECT_KEY} -Dsonar.sources=."
+                    
+                    // FIX: Using your actual credential ID: 'sonarqube-token'
+                    withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONAR_AUTH_TOKEN')]) {
+                        withSonarQubeEnv(env.SONAR_SERVER_ID) {
+                            // Execute the scanner, passing the token via the -Dsonar.login property
+                            sh "${env.SONAR_SCANNER_DIR}/bin/sonar-scanner -Dsonar.projectKey=${env.SONAR_PROJECT_KEY} -Dsonar.sources=. -Dsonar.login=${env.SONAR_AUTH_TOKEN}"
+                        }
                     }
 
                     // 3. Clean up files and dependencies (Shell Step)
@@ -94,7 +95,7 @@ pipeline {
         stage('Push Docker Image to Docker Hub') {
             steps {
                 // Uses your 'Dockerhub' credential ID for login
-                withCredentials([usernamePassword(credentialsId: 'Dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh '''
                         echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
                         docker tag ${DOCKER_IMAGE} ${DOCKER_USERNAME}/${DOCKER_IMAGE}:latest
@@ -107,7 +108,7 @@ pipeline {
         stage('Deploy to Nexus') {
             steps {
                 // Uses your 'nexus' credential ID for upload
-                withCredentials([usernamePassword(credentialsId: 'nexus', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
+                withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'NEXUS_USERNAME', passwordVariable: 'NEXUS_PASSWORD')]) {
                     sh """
                         echo 'Creating artifact and deploying to Nexus at ${NEXUS_URL}...'
                         tar -czf pomodoro-app.tar.gz dist/
