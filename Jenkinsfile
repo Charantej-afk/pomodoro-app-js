@@ -43,14 +43,9 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONARQUBE_TOKEN')]) {
-                        sh """
-                            sonar-scanner \
-                            -Dsonar.projectKey=pomodoro-app \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=http://sonarqube:9000 \
-                            -Dsonar.login=${SONARQUBE_TOKEN}
-                        """
+                    // Run SonarQube analysis using the SonarQube plugin for Jenkins
+                    withSonarQubeEnv('SonarQube') { 
+                        sh 'npm run build' // Replace with the relevant build command for your project
                     }
                 }
             }
