@@ -2,11 +2,10 @@ pipeline {
     agent {
         docker {
             image 'node:18' // Node.js environment
-            // Use 'root:root' to ensure permissions for apt/package installation
-            args '-u root:root' 
-            // FIX APPLIED: Explicitly attaching the agent container to the shared Docker network.
-            // Network name derived from the directory 'pomodoro-app-js' and the network name 'cicd-network'.
-            network 'pomodoro-app-js_cicd-network' 
+            // FIX: The 'network' option is not directly supported by the Jenkins plugin.
+            // It must be passed as an argument to 'docker run' using the '--network' flag inside 'args'.
+            // Combining '-u root:root' and '--network pomodoro-app-js_cicd-network'
+            args '-u root:root --network pomodoro-app-js_cicd-network' 
         }
     }
 
