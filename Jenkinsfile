@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     environment {
-        // Define necessary environment variables
         DOCKER_IMAGE = 'pomodoro-app'
         NEXUS_REPO = 'npm-releases'
         SONARQUBE_TOKEN = credentials('sonarqube-token') // Jenkins credentials for SonarQube token
-        NEXUS_CREDENTIALS = credentials('nexus-credentials') // Correct Jenkins credentials for Nexus
-        DOCKERHUB_CREDENTIALS = credentials('Dockerhub') // Correct Jenkins credentials for Docker Hub
+        NEXUS_CREDENTIALS = credentials('nexus-credentials') // Jenkins credentials for Nexus
+        DOCKERHUB_CREDENTIALS = credentials('Dockerhub') // Jenkins credentials for Docker Hub
     }
 
     stages {
@@ -27,6 +26,15 @@ pipeline {
             }
         }
 
+        stage('Build Code') {
+            steps {
+                script {
+                    // Build the project (e.g., using npm run build)
+                    sh 'npm run build'
+                }
+            }
+        }
+
         stage('Run Tests') {
             steps {
                 script {
@@ -39,6 +47,9 @@ pipeline {
         stage('Lint Code') {
             steps {
                 script {
+                    // Install ESLint if it's not installed yet
+                    sh 'npm install eslint'
+                    
                     // Lint the code using ESLint
                     sh 'npx eslint .'
                 }
