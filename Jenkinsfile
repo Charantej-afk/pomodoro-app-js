@@ -6,7 +6,7 @@ pipeline {
         DOCKER_IMAGE = 'pomodoro-app'
         NEXUS_REPO = 'npm-releases'
         SONARQUBE_TOKEN = credentials('sonarqube-token') // Jenkins credentials for SonarQube token
-        NEXUS_CREDENTIALS = credentials('nexus-credentials') // Jenkins credentials for Nexus
+        NEXUS_CREDENTIALS = credentials('nexus-credentials') // Correct Jenkins credentials for Nexus
         DOCKERHUB_CREDENTIALS = credentials('Dockerhub') // Correct Jenkins credentials for Docker Hub
     }
 
