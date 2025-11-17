@@ -6,10 +6,6 @@ pipeline {
         }
     }
 
-    tools {
-        SonarScanner 'SonarScanner' // Correct tool type for SonarQube Scanner
-    }
-
     environment {
         DOCKER_IMAGE = 'pomodoro-app'
         NEXUS_REPO = 'npm-releases'
