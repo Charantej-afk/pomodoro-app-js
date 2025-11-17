@@ -43,7 +43,10 @@ pipeline {
         stage('Lint Code') {
             steps {
                 script {
+                    // Install ESLint if it's not installed yet
                     sh 'npm install eslint'
+                    
+                    // Run ESLint using the flat config
                     sh 'npx eslint .'
                 }
             }
@@ -52,7 +55,6 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // Securely pass SonarQube token as an environment variable
                     withCredentials([string(credentialsId: 'sonarqube-token', variable: 'SONARQUBE_TOKEN')]) {
                         sh """
                             sonar-scanner \
