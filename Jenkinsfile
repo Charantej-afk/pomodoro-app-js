@@ -5,9 +5,9 @@ pipeline {
         // Define necessary environment variables
         DOCKER_IMAGE = 'pomodoro-app'
         NEXUS_REPO = 'npm-releases'
-        SONARQUBE_TOKEN = credentials('sonarqube-token') // Jenkins credentials
-        NEXUS_CREDENTIALS = credentials('nexus-credentials') // Jenkins credentials
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') // Jenkins credentials
+        SONARQUBE_TOKEN = credentials('sonarqube-token') // Jenkins credentials for SonarQube token
+        NEXUS_CREDENTIALS = credentials('nexus-credentials') // Jenkins credentials for Nexus
+        DOCKERHUB_CREDENTIALS = credentials('Dockerhub') // Correct Jenkins credentials for Docker Hub
     }
 
     stages {
@@ -75,7 +75,7 @@ pipeline {
             steps {
                 script {
                     // Push the Docker image to Docker Hub
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'Dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         sh """
                             docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}
                             docker tag ${DOCKER_IMAGE} ${DOCKER_USERNAME}/${DOCKER_IMAGE}:latest
