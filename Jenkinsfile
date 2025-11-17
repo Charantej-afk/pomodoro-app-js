@@ -1,5 +1,14 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:18' // Node.js environment for npm commands
+            args '-u root:root'
+        }
+    }
+
+    tools {
+        sonarQubeScanner 'SonarScanner' // Name configured in Jenkins Global Tool Configuration
+    }
 
     environment {
         DOCKER_IMAGE = 'pomodoro-app'
@@ -34,7 +43,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'sonar-scanner -Dsonar.projectKey=pomodoro-app -Dsonar.sources=. -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONARQUBE_TOKEN'
+                    sh 'sonar-scanner -Dsonar.projectKey=pomodoro-app -Dsonar.sources=.'
                 }
             }
         }
