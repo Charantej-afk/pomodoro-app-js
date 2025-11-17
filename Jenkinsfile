@@ -2,12 +2,12 @@ pipeline {
     agent {
         docker {
             image 'node:18' // Node.js environment for npm commands
-            args '-u root:root'
+            args '-u root:root' // Ensure proper permissions if needed
         }
     }
 
     tools {
-        sonar 'SonarScanner' // Correct tool type for SonarQube Scanner
+        sonarScanner 'SonarScanner' // Correct tool type for SonarQube Scanner
     }
 
     environment {
@@ -42,7 +42,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
+                withSonarQubeEnv('SonarQube') { // Ensure SonarQube environment is set correctly
                     sh 'sonar-scanner -Dsonar.projectKey=pomodoro-app -Dsonar.sources=.'
                 }
             }
