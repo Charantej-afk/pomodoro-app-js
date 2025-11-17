@@ -7,7 +7,7 @@ pipeline {
     }
 
     tools {
-        hudson.plugins.sonar.SonarRunnerInstallation 'SonarScanner' // Correct tool type
+        sonar 'SonarScanner' // Correct tool type for SonarQube Scanner
     }
 
     environment {
@@ -18,7 +18,11 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/ stage('Install Dependencies') {                git branch: 'main', url: 'https://github.com/Charantej-afk/pomodoro-app-js.git'
+                git branch: 'main', url: 'https://github.com/Charantej-afk/pomodoro-app-js.git'
+            }
+        }
+
+        stage('Install Dependencies') {
             steps {
                 sh 'npm install'
             }
@@ -83,6 +87,3 @@ pipeline {
         }
     }
 }
-            }
-        }
-
