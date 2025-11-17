@@ -4,6 +4,9 @@ pipeline {
             image 'node:18' // Node.js environment
             // Use 'root:root' to ensure permissions for apt/package installation
             args '-u root:root' 
+            // FIX APPLIED: Explicitly attaching the agent container to the shared Docker network.
+            // Network name derived from the directory 'pomodoro-app-js' and the network name 'cicd-network'.
+            network 'pomodoro-app-js_cicd-network' 
         }
     }
 
