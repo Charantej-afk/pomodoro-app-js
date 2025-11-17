@@ -7,7 +7,7 @@ pipeline {
     }
 
     tools {
-        sonarScanner 'SonarScanner' // Correct tool type for SonarQube Scanner
+        SonarScanner 'SonarScanner' // Correct tool type for SonarQube Scanner
     }
 
     environment {
