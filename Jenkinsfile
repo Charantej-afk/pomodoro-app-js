@@ -1,8 +1,10 @@
 pipeline {
     agent {
         docker {
-            image 'node:18'
-            args '-u root:root --network pomodoro-app-js_cicd-network' 
+            image 'node:18' // Node.js environment
+            // FIX: Add -v /var/run/docker.sock:/var/run/docker.sock to allow the container 
+            // to execute Docker commands (build, push) on the host's Docker daemon.
+            args '-u root:root --network pomodoro-app-js_cicd-network -v /var/run/docker.sock:/var/run/docker.sock' 
         }
     }
 
@@ -76,11 +78,8 @@ pipeline {
 
                     // 3. Clean up files and dependencies (Shell Step)
                     sh """
-                        echo 'Cleaning up scanner files and dependencies...'
+                        echo 'Cleaning up scanner files...'
                         rm -rf sonar-scanner.zip ${env.SONAR_SCANNER_DIR}
-                        # Clean up JRE and apt lists to remove tools only needed for this stage
-                        apt-get remove -y openjdk-17-jre unzip curl -qq && apt-get autoremove -y -qq
-                        rm -rf /var/lib/apt/lists/*
                     """
                 }
             }
@@ -88,6 +87,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
+                // This step now runs successfully using the host Docker daemon via the mounted socket
                 sh 'docker build -t ${DOCKER_IMAGE} .'
             }
         }
